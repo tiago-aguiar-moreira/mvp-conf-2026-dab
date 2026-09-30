@@ -1,0 +1,32 @@
+### Data API Builder — Demo (MVP Conf 2026)
+### Requer a extensão "REST Client" (humao.rest-client) no VS Code.
+### Pré-requisito: container dab-demo-sql rodando + `dab start --config dab-config.json`
+### Obs: GraphQL foi removido do ambiente de demo (runtime.graphql.enabled = false) — só REST e MCP.
+
+@baseUrl = http://localhost:5000
+
+### 1. REST — Produtos (role anonymous, sem header)
+GET {{baseUrl}}/api/produtos
+
+### 2. Roles — cliente (role autenticada genérica, vê todos os pedidos nesta demo)
+GET {{baseUrl}}/api/pedidos
+X-MS-API-ROLE: cliente
+
+### 3. Roles — admin (mesmo acesso de leitura + create/update/delete)
+GET {{baseUrl}}/api/pedidos
+X-MS-API-ROLE: admin
+
+### 4. Segurança — field exclude: role cliente (sem cpf/telefone)
+GET {{baseUrl}}/api/clientes
+X-MS-API-ROLE: cliente
+
+### 5. Segurança — field exclude: role admin (com todos os campos, para contraste)
+GET {{baseUrl}}/api/clientes
+X-MS-API-ROLE: admin
+
+### 6. Controle — sem header (deve dar 403, Pedidos não tem role anonymous)
+GET {{baseUrl}}/api/pedidos
+
+### 7. Controle — role inexistente (deve dar 403)
+GET {{baseUrl}}/api/pedidos
+X-MS-API-ROLE: role_que_nao_existe

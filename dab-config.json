@@ -1,0 +1,130 @@
+{
+  "$schema": "https://github.com/Azure/data-api-builder/releases/latest/download/dab.draft.schema.json",
+  "data-source": {
+    "database-type": "mssql",
+    "connection-string": "@env('DAB_DEMO_CONNECTION_STRING')"
+  },
+  "runtime": {
+    "rest": {
+      "enabled": true,
+      "path": "/api"
+    },
+    "graphql": {
+      "enabled": false
+    },
+    "mcp": {
+      "enabled": true,
+      "path": "/mcp"
+    },
+    "host": {
+      "mode": "development",
+      "authentication": {
+        "provider": "Simulator"
+      }
+    }
+  },
+  "entities": {
+    "clientes": {
+      "source": "Clientes",
+      "rest": true,
+      "mcp": true,
+      "permissions": [
+        {
+          "role": "cliente",
+          "actions": [
+            {
+              "action": "read",
+              "fields": {
+                "exclude": [ "cpf", "telefone" ]
+              }
+            }
+          ]
+        },
+        {
+          "role": "admin",
+          "actions": ["read", "create", "update", "delete"]
+        }
+      ],
+      "relationships": {
+        "pedidos": {
+          "cardinality": "many",
+          "target.entity": "pedidos",
+          "source.fields": ["id"],
+          "target.fields": ["cliente_id"]
+        }
+      }
+    },
+
+    "produtos": {
+      "source": "Produtos",
+      "rest": true,
+      "mcp": true,
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": ["read"]
+        }
+      ]
+    },
+
+    "pedidos": {
+      "source": "Pedidos",
+      "rest": true,
+      "mcp": true,
+      "permissions": [
+        {
+          "role": "cliente",
+          "actions": ["read"]
+        },
+        {
+          "role": "admin",
+          "actions": ["read", "create", "update", "delete"]
+        }
+      ],
+      "relationships": {
+        "cliente": {
+          "cardinality": "one",
+          "target.entity": "clientes",
+          "source.fields": ["cliente_id"],
+          "target.fields": ["id"]
+        },
+        "itens": {
+          "cardinality": "many",
+          "target.entity": "itenspedido",
+          "source.fields": ["id"],
+          "target.fields": ["pedido_id"]
+        }
+      }
+    },
+
+    "itenspedido": {
+      "source": "ItensPedido",
+      "rest": true,
+      "mcp": true,
+      "permissions": [
+        {
+          "role": "cliente",
+          "actions": ["read"]
+        },
+        {
+          "role": "admin",
+          "actions": ["read", "create", "update", "delete"]
+        }
+      ],
+      "relationships": {
+        "pedido": {
+          "cardinality": "one",
+          "target.entity": "pedidos",
+          "source.fields": ["pedido_id"],
+          "target.fields": ["id"]
+        },
+        "produto": {
+          "cardinality": "one",
+          "target.entity": "produtos",
+          "source.fields": ["produto_id"],
+          "target.fields": ["id"]
+        }
+      }
+    }
+  }
+}

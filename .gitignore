@@ -1,0 +1,2 @@
+# Segredos locais (senha do SQL Server, connection string)
+.env
